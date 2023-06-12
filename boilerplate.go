@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+// Clear line cursor is currently on to render new line of len(string) < len(previous_string).
+func placeholder() {
+	var argument = string
+	fmt.Printf("\r\033[2K%s", argument)
+
+}
+
 // ByteCount functions returns string representation of byte sizes.
 func ByteCountSI(b int64) string {
 	const unit = 1000
