@@ -7,14 +7,14 @@ import (
 	"net/http"
 )
 
-func apiGET() {
+func api_GET_request() {
 	url := "https://fqdn.com"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	// reg.Header.Add("header-value", "API_KEY")
+	// Appending API_KEY to request.
+	// reg.Header.Add("header-value", "value")
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -31,5 +31,5 @@ func apiGET() {
 }
 
 func main() {
-	apiGET()
+	api_GET_request()
 }
