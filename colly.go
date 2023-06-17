@@ -22,8 +22,8 @@ func main() {
 	})
 
 	// Before making a request print "Visiting ..."
-	c.OnRequest(func(e *colly.Request) {
-		fmt.Println("Visiting", e.URL.String())
+	c.OnRequest(func(r *colly.Request) {
+		fmt.Println("Visiting", r.URL)
 	})
 
 	c.OnResponse(func(r *colly.Response) {
@@ -32,6 +32,16 @@ func main() {
 		for key, value := range *r.Headers {
 			fmt.Printf("%s: %s\n", key, value)
 		}
+	})
+
+	c.OnError(func(r *colly.Response, e error) {
+		fmt.Println("Error:", e)
+	})
+
+	c.OnScraped(func(r *colly.Response) {
+		fmt.Println("Finished:", r.Request.URL)
+		// File data to file or preform post processing.
+
 	})
 
 	url := "https://fqdn.com"
