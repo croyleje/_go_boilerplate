@@ -4,80 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
-	"strings"
 )
-
-// Clear line cursor is currently on to render new line of len(string) < len(previous_string).
-func placeholder() {
-	var argument = string
-	fmt.Printf("\r\033[2K%s", argument)
-
-}
-
-// ByteCount functions returns string representation of byte sizes.
-func ByteCountSI(b int64) string {
-	const unit = 1000
-	if b < unit {
-		return fmt.Sprintf("%d B", b)
-	}
-	div, exp := int64(unit), 0
-	for n := b / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %cB",
-		float64(b)/float64(div), "kMGTPE"[exp])
-}
-
-func ByteCountIEC(b int64) string {
-	const unit = 1024
-	if b < unit {
-		return fmt.Sprintf("%d B", b)
-	}
-	div, exp := int64(unit), 0
-	for n := b / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	return fmt.Sprintf("%.1f %ciB",
-		float64(b)/float64(div), "KMGTPE"[exp])
-}
-
-/*
-Example output of ByteCount.
-
-int64 passed		ByteCountSI		ByteCountIEC
-<= 999				999 B			999 B
->= 1000				1.0 kB			1000 B
-1023				1.0 kB			1023 B
-1024				1.0 kB			1.0 KiB
-987, 654, 321		987.7 MB		941.9 MiB
-math.MaxInt64		9.2 EB			8.0 EiB
-*/
-
-// Convert number range ie. 3-7 [3, 4, 5, 6, 7]
-func convertEntry(str []string) []int {
-	var rtn []int
-	for _, v := range str {
-		if strings.Contains(v, "-") {
-			expand := strings.Split(v, "-")
-			begin, _ := strconv.Atoi(expand[0])
-			end, _ := strconv.Atoi(expand[1])
-
-			for i := begin; i <= end; {
-				rtn = append(rtn, i)
-				i++
-			}
-		} else {
-			i, _ := strconv.Atoi(v)
-			rtn = append(rtn, i)
-		}
-	}
-	return rtn
-}
-
-// End
 
 // Boilerplate selectable item list.
 // TODO: Code is not fully implemented meant only as a reference.
@@ -173,6 +100,8 @@ func (l *List) LastEntry() {
 func (l *List) RenderItems(redraw bool) {
 	if redraw {
 		// Move cursor up by number of menu items.  Assumes each menu item is ONE line.
+		// Use either native escape codes to move cursor or atomicgo cursor package.
+		// https://github.com/atomicgo/cursor
 		cursor.Up(len(m.MenuItems) - 1)
 	}
 
@@ -226,6 +155,8 @@ func (l *List) CallProcess() (results []string, escape bool) {
 	l.Render()
 
 	for {
+		// Use either getChar() function or atomicgo keyboard package.
+		// https://github.com/atomicgo/keyboard
 		ascii, keyCode, err := getChar()
 
 		if (ascii == 3 || ascii == 27) || err != nil {
@@ -238,7 +169,7 @@ func (l *List) CallProcess() (results []string, escape bool) {
 	}
 }
 
-func main() {
+func _main() {
 	list := InitializeList()
 	files, err := os.ReadDir("/full/path/to/files")
 	if err != nil {
